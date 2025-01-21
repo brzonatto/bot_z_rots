@@ -72,9 +72,7 @@ module.exports = {
             );
 
             const totalDeathsAllies = await utils.countTotalDeaths(statsAlliesResult);
-            const totalDeathsEnemies = await utils.countTotalDeaths(
-                statsEnemmiesResult
-            );
+            const totalDeathsEnemies = await utils.countTotalDeaths(statsEnemmiesResult);
 
             const stats = [
                 `General Statistics`,
