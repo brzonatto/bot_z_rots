@@ -138,7 +138,8 @@ const calcWarStatistics = async (
     enemyGuild = null
 ) => {
     // ally
-    const playersTwoNames = playersTwo.map((ally) => ally.name);
+    const playersTwoNames = playersTwo.map((player) => player.name);
+    const playersOneNames = playersOne.map((player) => player.name);
 
     // enemy
     const updatedPlayersOne = playersOne.map((player) => ({
@@ -185,19 +186,22 @@ const calcWarStatistics = async (
                     })) || [],
         },
     }));
-
-    //ally
+    
     const killStats = playersTwoNames.reduce((acc, player) => {
         acc[player] = { kills: 0, mostDamage: 0, fullKills: 0, deaths: 0, KDA: 0 };
         return acc;
     }, {});
+    
 
-    //ally
     updatedPlayersTwo.forEach((player) => {
-        killStats[player.name].deaths = player.deaths?.deaths.length;
+        
+        const relevantDeaths = player.deaths?.deaths.filter(
+            (death) => playersOneNames.includes(death.killed_by) || playersOneNames.includes(death.mostdamage_by)
+        );
+
+        killStats[player.name].deaths = relevantDeaths ? relevantDeaths.length : 0;
     });
 
-    // enemy
     updatedPlayersOne.forEach((player) => {
         player.deaths?.deaths.forEach((death) => {
             if (playersTwoNames.includes(death.killed_by)) {
@@ -322,6 +326,15 @@ const generateTableImage = async (data) => {
     return canvas.toBuffer();
 };
 
+const countTotalDeathsBy = async (data, players) => {
+    const names = players.map((ally) => ally.name);
+    return data.reduce((totalDeaths, player) => {
+        console.log(player)
+        const wasKilledBy = names.includes(player.killed_by) || names.includes(player.mostdamage_by);
+        return totalDeaths + (wasKilledBy ? 1 : 0);
+    }, 0);
+};
+
 const countTotalDeaths = async (data) => {
     return data.reduce((totalDeaths, player) => totalDeaths + player.deaths, 0);
 };
@@ -403,4 +416,5 @@ module.exports = {
     generateTableImage,
     countTotalDeaths,
     mergeImagesWithStats,
+    countTotalDeathsBy
 };
