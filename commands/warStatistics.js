@@ -30,57 +30,76 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const startTime = await utils.convertToTimestamp(
-            interaction.options.getString("starttime")
-        );
-        const endTime = await utils.convertToTimestamp(
-            interaction.options.getString("endtime")
-        );
-        const enemyGuild = interaction.options.getString("enemyguild");
-        const allyGuild = interaction.options.getString("allyguild");
-        const enemies = await db.listEnemies(enemyGuild);
-        const allies = await db.listAllies(allyGuild);
+        try {
+            await interaction.deferReply();
 
-        const statsAlliesResult = await utils.calcWarStatistics(
-            enemies,
-            allies,
-            startTime,
-            endTime
-        );
-        const statsEnemmiesResult = await utils.calcWarStatistics(
-            allies,
-            enemies,
-            startTime,
-            endTime
-        );
+            const startTime = await utils.convertToTimestamp(
+                interaction.options.getString("starttime")
+            );
+            const endTime = await utils.convertToTimestamp(
+                interaction.options.getString("endtime")
+            );
 
-        const imageBufferAllies = await utils.generateTableImage(statsAlliesResult);
-        const imageBufferEnemies = await utils.generateTableImage(
-            statsEnemmiesResult
-        );
+            if (!startTime || !endTime) {
+                throw new Error("Invalid start or end time provided.");
+            }
 
-        const totalDeathsAllies = await utils.countTotalDeaths(statsAlliesResult);
-        const totalDeathsEnemies = await utils.countTotalDeaths(
-            statsEnemmiesResult
-        );
+            const enemyGuild = interaction.options.getString("enemyguild");
+            const allyGuild = interaction.options.getString("allyguild");
+            const enemies = await db.listEnemies(enemyGuild);
+            const allies = await db.listAllies(allyGuild);
 
-        const stats = [
-            `General Statistics`,
-            `${interaction.options.getString(
-                "starttime"
-            )} - ${interaction.options.getString("endtime")}`,
-            `Total Allies ${statsAlliesResult.length} x ${statsEnemmiesResult.length} Total Enemies`,
-            `Allies score ${totalDeathsEnemies} x ${totalDeathsAllies} Enemies score`,
-        ];
+            if (!enemies || !allies) {
+                throw new Error("Unable to fetch data for allies or enemies.");
+            }
 
-        const merge = await utils.mergeImagesWithStats(
-            imageBufferAllies,
-            imageBufferEnemies,
-            stats
-        );
+            const statsAlliesResult = await utils.calcWarStatistics(
+                enemies,
+                allies,
+                startTime,
+                endTime
+            );
+            const statsEnemmiesResult = await utils.calcWarStatistics(
+                allies,
+                enemies,
+                startTime,
+                endTime
+            );
 
-        await interaction.reply({
-            files: [{ attachment: merge, name: "warStatistics.png" }],
-        });
+            const imageBufferAllies = await utils.generateTableImage(statsAlliesResult);
+            const imageBufferEnemies = await utils.generateTableImage(
+                statsEnemmiesResult
+            );
+
+            const totalDeathsAllies = await utils.countTotalDeaths(statsAlliesResult);
+            const totalDeathsEnemies = await utils.countTotalDeaths(
+                statsEnemmiesResult
+            );
+
+            const stats = [
+                `General Statistics`,
+                `${interaction.options.getString(
+                    "starttime"
+                )} - ${interaction.options.getString("endtime")}`,
+                `Total Allies ${statsAlliesResult.length} x ${statsEnemmiesResult.length} Total Enemies`,
+                `Allies score ${totalDeathsEnemies} x ${totalDeathsAllies} Enemies score`,
+            ];
+
+            const merge = await utils.mergeImagesWithStats(
+                imageBufferAllies,
+                imageBufferEnemies,
+                stats
+            );
+
+            await interaction.editReply({
+                files: [{ attachment: merge, name: "warStatistics.png" }],
+            });
+        } catch (error) {
+            console.error("Error in command:", error);
+            await interaction.editReply({
+                content: "An error occurred while processing war statistics. Please try again later.",
+                ephemeral: true,
+            });
+        }
     },
 };

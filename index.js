@@ -96,9 +96,9 @@ client.once(Events.ClientReady, (readyClient) => {
 
 client.login(TOKEN);
 
-// Listener
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
+
   const command = interaction.client.commands.get(interaction.commandName);
   if (!command) {
     console.error("Comando não encontrado");
@@ -106,9 +106,22 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 
   try {
+    // Chama o comando e executa a interação
     await command.execute(interaction);
   } catch (error) {
-    console.error(error);
-    await interaction.reply("Houve um erro ao enviar o comando!");
+    console.error("Erro ao executar o comando:", error);
+
+    // Garante que o erro seja tratado sem causar problemas com a interação
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp({
+        content: 'Houve um erro ao processar o comando!',
+        ephemeral: true,
+      });
+    } else {
+      await interaction.reply({
+        content: 'Houve um erro ao processar o comando!',
+        ephemeral: true,
+      });
+    }
   }
 });
