@@ -7,10 +7,10 @@ const {
 } = require("discord.js");
 const cron = require("node-cron");
 const serverLogs = require("./serverLogs");
-const tasks = require("./tasks.js");
 const rotsApi = require("./data/rotsApi.js");
 const db = require('./data/db.js')
 const { performance } = require('perf_hooks');
+const utils = require('./utils.js')
 
 // dotenv
 const dotenv = require("dotenv");
@@ -65,7 +65,9 @@ client.once(Events.ClientReady, (readyClient) => {
               .setColor(log.pvp_type === 'Ally' ? '#00FF00' : '#FF0000') // Verde para Ally, Vermelho para Enemy
               .setTitle(log.pvp_type === 'Ally' ? 'ALLY DIED' : 'ENEMY DIED') // Título
               .setDescription(
-                `[${log.name}](https://saiyansreturn.com/profile/${log.id}?server=Universe%20Beerus) - Killed by ${log.death.is_player == 1 ? `[${log.death.killed_by}](http://teste.com.br)` : log.death.killed_by} and ${log.death.mostdamage_by == 1 ? `[${log.death.mostdamage_by}](http://teste.com.br)` : log.death.mostdamage_by}`
+                log.death.killed_by == log.death.mostdamage_by 
+                ? `${utils.convertTimestamp(log.death.time)}  [${log.name}](https://saiyansreturn.com/profile/${log.id}?server=Universe%20Beerus): Killed by ${log.death.is_player == 1 ? `[${log.death.killed_by}](https://saiyansreturn.com/profile/${log.playerKilledByID}?server=Universe%20Beerus)` : log.death.killed_by}` 
+                : `${utils.convertTimestamp(log.death.time)}  [${log.name}](https://saiyansreturn.com/profile/${log.id}?server=Universe%20Beerus): Killed by ${log.death.is_player == 1 ? `[${log.death.killed_by}](https://saiyansreturn.com/profile/${log.playerKilledByID}?server=Universe%20Beerus)` : log.death.killed_by} and ${log.death.mostdamage_is_player == 1 ? `[${log.death.mostdamage_by}](https://saiyansreturn.com/profile/${log.playerMostDamageByID}?server=Universe%20Beerus)` : log.death.mostdamage_by}`
               )
 
             await channelDeaths.send({ embeds: [embed] });
