@@ -14,7 +14,7 @@ const db = require('./data/db.js')
 // dotenv
 const dotenv = require("dotenv");
 dotenv.config();
-const { TOKEN, CHANNEL_UPLEVEL_LOGS_ID, CHANNEL_DEATHS_LOGS_ID } = process.env;
+const { TOKEN, CHANNEL_SERVER_LOGS_ID } = process.env;
 
 // commands import
 const fs = require("node:fs");
@@ -66,8 +66,8 @@ client.once(Events.ClientReady, (readyClient) => {
   //     const allPlayers = await rotsApi.findAllPlayers()
   //     await db.updatePlayers(allPlayers)
 
-  //     const channelDeaths = client.channels.cache.get(CHANNEL_DEATHS_LOGS_ID)
-  //     const channelLevels = client.channels.cache.get(CHANNEL_DEATHS_LOGS_ID)
+  //     const channelDeaths = client.channels.cache.get(CHANNEL_SERVER_LOGS_ID)
+  //     const channelLevels = client.channels.cache.get(CHANNEL_SERVER_LOGS_ID)
   //     if (channelLevels) {
   //         const upLevelsLog = await serverLogs.compareLevel()
 
