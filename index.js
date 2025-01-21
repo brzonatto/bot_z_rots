@@ -3,13 +3,14 @@ const {
   Events,
   GatewayIntentBits,
   Collection,
-  EmbedBuilder,
+  EmbedBuilder
 } = require("discord.js");
 const cron = require("node-cron");
 const serverLogs = require("./serverLogs");
 const tasks = require("./tasks.js");
 const rotsApi = require("./data/rotsApi.js");
 const db = require('./data/db.js')
+const { performance } = require('perf_hooks');
 
 // dotenv
 const dotenv = require("dotenv");
@@ -45,18 +46,47 @@ let isRunning = false;
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`${readyClient.user.tag} is Ready!`);
 
-  cron.schedule("*/15 * * * * *", async () => {
+  cron.schedule('*/15 * * * * *', async () => {
     if (isRunning) return;
 
-    isRunning = true
+    isRunning = true;
+    
+    const startTime = performance.now();
 
     try {
+      const channelDeaths = client.channels.cache.get(CHANNEL_SERVER_LOGS_ID);
+      const deathsLog = await serverLogs.compareDeaths();
+      console.log(`Total de mortes detectadas: ${deathsLog.length}`);
+
+      if (deathsLog.length > 0) {
+        if (channelDeaths) {
+          for (const log of deathsLog) {
+            const embed = new EmbedBuilder()
+              .setColor(log.pvp_type === 'Ally' ? '#00FF00' : '#FF0000') // Verde para Ally, Vermelho para Enemy
+              .setTitle(log.pvp_type === 'Ally' ? 'ALLY DIED' : 'ENEMY DIED') // Título
+              .setDescription(
+                `[${log.name}](https://saiyansreturn.com/profile/${log.id}?server=Universe%20Beerus) - Killed by ${log.death.is_player == 1 ? `[${log.death.killed_by}](http://teste.com.br)` : log.death.killed_by} and ${log.death.mostdamage_by == 1 ? `[${log.death.mostdamage_by}](http://teste.com.br)` : log.death.mostdamage_by}`
+              )
+
+            await channelDeaths.send({ embeds: [embed] });
+          }
+        } else {
+          console.error(
+            'Canal não encontrado. Verifique se CHANNEL_SERVER_LOGS_ID está correto no arquivo .env.'
+          );
+        }
+      }
+
+      // Atualiza todos os jogadores
       const allPlayers = await rotsApi.findAllPlayers();
       await db.updatePlayers(allPlayers);
     } catch (error) {
-      console.error(error);
+      console.error('Erro durante a execução do cron:', error);
     } finally {
-        isRunning = false
+      const endTime = performance.now(); // Marca o fim da execução
+      const executionTime = (endTime - startTime) / 1000; // Calcula o tempo em segundos
+      console.log(`Ciclo do cron concluído em ${executionTime.toFixed(2)} segundos.`);
+      isRunning = false;
     }
   });
 
