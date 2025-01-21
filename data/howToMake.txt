@@ -1,0 +1,17 @@
+***Criar função para comaparar e atualizar a base de inimigos e aliados DONE
+**Criar Adição em lote de inimigos e aliados
+***Criar comando para gerar estatisticas de guerra por periodo DONE
+
+
+*Criar comando para mostrar a proporção da troca de status 
+
+
+
+
+Legenda:
+
+*** Prioridade alta
+
+** Prioridade media
+
+* Prioridade baixa
