@@ -1,5 +1,5 @@
-const db = require('./data/db')
-const rotsApi = require('./data/rotsApi')
+const db = require("./data/db");
+const rotsApi = require("./data/rotsApi");
 
 const compareDeaths = async () => {
     const localPlayers = await db.findAll(); // Busca todos os jogadores da base local
@@ -8,25 +8,38 @@ const compareDeaths = async () => {
 
     for (const localPlayer of localPlayers) {
         const rotsPlayer = await rotsApi.findPlayerByID(localPlayer.id); // Busca o jogador na API
-        console.log('name', localPlayer.name);
-        console.log('localPlayer', localPlayer.deaths?.deaths?.[0]?.time);
-        console.log('rotsPlayer', rotsPlayer.deaths?.deaths?.[0]?.time);
-        console.log('###########################################################');
+        console.log("name", localPlayer.name);
+        console.log("localPlayer", localPlayer.deaths?.deaths?.[0]?.time);
+        console.log("rotsPlayer", rotsPlayer.deaths?.deaths?.[0]?.time);
+        console.log(
+            "###########################################################"
+        );
 
         let playerKilledBy = null;
         let playerMostDamageBy = null;
 
         if (rotsPlayer.deaths?.deaths?.[0]?.is_player === 1) {
-            const killedByResponse = await rotsApi.findIDPlayer(rotsPlayer.deaths.deaths[0].killed_by);
-            playerKilledBy = Array.isArray(killedByResponse) ? killedByResponse[0] : null;
+            const killedByResponse = await rotsApi.findIDPlayer(
+                rotsPlayer.deaths.deaths[0].killed_by
+            );
+            playerKilledBy = Array.isArray(killedByResponse)
+                ? killedByResponse[0]
+                : null;
         }
 
         if (rotsPlayer.deaths?.deaths?.[0]?.mostdamage_is_player === 1) {
-            const mostDamageByResponse = await rotsApi.findIDPlayer(rotsPlayer.deaths.deaths[0].mostdamage_by);
-            playerMostDamageBy = Array.isArray(mostDamageByResponse) ? mostDamageByResponse[0] : null;
+            const mostDamageByResponse = await rotsApi.findIDPlayer(
+                rotsPlayer.deaths.deaths[0].mostdamage_by
+            );
+            playerMostDamageBy = Array.isArray(mostDamageByResponse)
+                ? mostDamageByResponse[0]
+                : null;
         }
 
-        if (localPlayer.deaths?.deaths?.[0]?.time !== rotsPlayer.deaths?.deaths?.[0]?.time) {
+        if (
+            localPlayer.deaths?.deaths?.[0]?.time !==
+            rotsPlayer.deaths?.deaths?.[0]?.time
+        ) {
             differences.push({
                 id: localPlayer.id,
                 name: localPlayer.name,
@@ -44,7 +57,6 @@ const compareDeaths = async () => {
     return differences; // Retorna o array com as diferenças
 };
 
-
 module.exports = {
-    compareDeaths
-}
+    compareDeaths,
+};
