@@ -91,39 +91,6 @@ client.once(Events.ClientReady, (readyClient) => {
       isRunning = false;
     }
   });
-
-  //tasks(client)
-
-  // cron.schedule('*/15 * * * * *', async () => {
-  //     const allPlayers = await rotsApi.findAllPlayers()
-  //     await db.updatePlayers(allPlayers)
-
-  //     const channelDeaths = client.channels.cache.get(CHANNEL_SERVER_LOGS_ID)
-  //     const channelLevels = client.channels.cache.get(CHANNEL_SERVER_LOGS_ID)
-  //     if (channelLevels) {
-  //         const upLevelsLog = await serverLogs.compareLevel()
-
-  //         for (const log of upLevelsLog) {
-  //             const card = utils.makeLevelUpCard(log)
-
-  //             await channelLevels.send({ embeds: [card] })
-  //         }
-  //     } else {
-  //         console.error('Canal não encontrado. Verifique se CHANNEL_SERVER_LOGS_ID está correto no arquivo .env.')
-  //     }
-
-  //     if (channelDeaths) {
-  //         const deathsLog = await serverLogs.compareDeath()
-
-  //         for (const log of deathsLog) {
-  //             const card = utils.makeLevelUpCard(log)
-
-  //             await channelDeaths.send({ embeds: [card] })
-  //         }
-  //     } else {
-  //         console.error('Canal não encontrado. Verifique se CHANNEL_SERVER_LOGS_ID está correto no arquivo .env.')
-  //     }
-  // })
 });
 
 client.login(TOKEN);
