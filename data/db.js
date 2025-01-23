@@ -28,17 +28,19 @@ const update = async (filter, updatedFields) => {
 const updatePlayers = async (playersArray) => {
     const db = await connect();
     const collection = db.collection('players');
+    // let count = 0
 
     for (const player of playersArray) {
+
         // Atualiza cada jogador com base no filtro (por exemplo, `_id` ou `name`)
         await collection.updateOne(
             { id: player.id }, // Filtro (ajuste conforme o identificador que está usando)
             { $set: player } // Atualiza os campos com os dados do objeto atual
         );
-        //console.log(`Character ${player.name} updated.`)
+        // console.log(`Update: ${count}/${playersArray.length}`)
+        // count++
     }
-
-    console.log('Base updated.')
+    // console.log('Base updated.')
 };
 
 const listEnemies = async (enemyGuild = null) => {
