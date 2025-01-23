@@ -32,7 +32,7 @@ module.exports = {
         }
 
         const nickName = interaction.options.getString('nickname');
-        const playerFirstFind = await rotsApi.findIDPlayer(nickName)
+        const playerFirstFind = await rotsApi.findByName(nickName)
         if (playerFirstFind.length < 1) return  await interaction.reply('Character not found.')
         const character =  await rotsApi.findPlayerByID(playerFirstFind[0].id)         
             
