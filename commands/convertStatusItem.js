@@ -2,6 +2,7 @@ const {
     SlashCommandBuilder,
 } = require("discord.js");
 const tiers = require("../data/tiers");
+const utils = require('../utils')
 
 const statusArray = tiers.tiers().map((item) => ({
     name: item.name,
@@ -68,7 +69,8 @@ module.exports = {
         const statusNameToConvert = interaction.options.getString(
             "statusnametoconvert"
         );
-        const valueBonus = interaction.options.getString('valuebonus')
+        const valueBonus = utils.formatBonusValue(interaction.options.getString('valuebonus'))
+
         const result = tiers.convertBonus(tier, currentStatusName, statusNameToConvert, valueBonus)
 
         await interaction.reply({ embeds: [result]});
