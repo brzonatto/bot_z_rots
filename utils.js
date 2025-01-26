@@ -404,6 +404,12 @@ const mergeImagesWithStats = async (imageBuffer1, imageBuffer2, stats) => {
     return canvas.toBuffer();
 };
 
+function formatBonusValue(bonusValue) {
+    // Substituir vírgula por ponto
+    const formattedValue = bonusValue.replace(',', '.');
+    return formattedValue;
+}
+
 module.exports = {
     setClass,
     setTumb,
@@ -416,5 +422,6 @@ module.exports = {
     generateTableImage,
     countTotalDeaths,
     mergeImagesWithStats,
-    countTotalDeathsBy
+    countTotalDeathsBy,
+    formatBonusValue
 };
