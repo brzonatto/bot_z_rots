@@ -28,7 +28,7 @@ const findPlayerByID = async (playerID) => {
 
 const findAllPlayersParallel = async () => {
     const allPlayersInDB = await db.findAll(); // Busca todos os jogadores no banco de dados
-    const limit = pLimit(20); // Limita a 20 requisições simultâneas
+    const limit = pLimit(15); // Limita a 20 requisições simultâneas
 
     const promises = allPlayersInDB.map(player =>
         limit(async () => {
