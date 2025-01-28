@@ -9,7 +9,7 @@ const statusArray = tiers.tiers().map((item) => ({
     value: item.name,
 }));
 
-module.exports = {
+module.exports = {  
     data: new SlashCommandBuilder()
         .setName("convertstatusitem")
         .setDescription("Convert item status.")

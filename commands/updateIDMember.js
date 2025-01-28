@@ -7,8 +7,8 @@ const { CHANNEL_ADMIN_COMMANDS_ID, REQUIRED_ROLE_ID } = process.env;
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("addally")
-        .setDescription("Insert a new ally.")
+        .setName("updateidmember")
+        .setDescription("Update a new ally.")
         .addStringOption((option) =>
             option
                 .setName("nickname")
@@ -40,31 +40,18 @@ module.exports = {
 
         const nickName = interaction.options.getString("nickname");
         const memberID = interaction.options.getString("idmember");
-        const playerFirstFind = await rotsApi.findByName(nickName);
-        if (playerFirstFind.length < 1)
-            return await interaction.reply("Character not found.");
-        const character = await rotsApi.findPlayerByID(playerFirstFind[0].id);
 
         try {
-            const ifIDExists = await db.findPlayerByID(character.id);
-
-            if (ifIDExists) {
-                const pvpType = await db.findTypePlayerByID(character.id);
-                if (pvpType == "Enemy")
-                    return await interaction.reply(
-                        "This player already registered as Enemy."
-                    );
-                if (ifIDExists)
-                    return await interaction.reply("Ally already registered.");
+            const character = await db.findPlayerByNameIgnoreCase(nickName);
+            if (!character) {
+                return await interaction.reply("Character not found.");
             } else {
-                character.memberID = memberID
-                character.pvp_type = "Ally";
-                await db.insert(character);
+                await db.update({ id: character.id }, { memberID: memberID });
             }
         } catch (error) {
             console.error(error);
         }
 
-        await interaction.reply(`Ally inserted: ${nickName}`);
+        await interaction.reply(`Ally updated: ${nickName}`);
     },
 };

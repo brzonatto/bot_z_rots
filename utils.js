@@ -404,10 +404,25 @@ const mergeImagesWithStats = async (imageBuffer1, imageBuffer2, stats) => {
     return canvas.toBuffer();
 };
 
-function formatBonusValue(bonusValue) {
+const formatBonusValue = (bonusValue) => {
     // Substituir vírgula por ponto
     const formattedValue = bonusValue.replace(',', '.');
     return formattedValue;
+}
+
+const mensagemEngracadaDeMorte = () => {
+    const mensagens = [
+        "bateu no inimigo... com a cara!",
+        "tentou... por uns dois segundos!",
+        "apertou o botão errado no momento certo: o combo perfeito para a derrota.",
+        "mamou com vontade!",
+        "faleceu?",
+        "tropeçou, caiu, e a gravidade fez o resto. RIP!",
+        "tentou ser herói, mas virou estatística. Boa tentativa!"
+    ];
+
+    const indiceAleatorio = Math.floor(Math.random() * mensagens.length);
+    return mensagens[indiceAleatorio];
 }
 
 module.exports = {
@@ -423,5 +438,6 @@ module.exports = {
     countTotalDeaths,
     mergeImagesWithStats,
     countTotalDeathsBy,
-    formatBonusValue
+    formatBonusValue,
+    mensagemEngracadaDeMorte
 };
