@@ -1,5 +1,6 @@
 const db = require("./data/db");
 const rotsApi = require("./data/rotsApi");
+const djs = require("discord.js");
 
 const getKillerPlayer = async (nickname) => {   
     const response = await rotsApi.findByName(nickname);
@@ -24,8 +25,8 @@ const compareDeaths = async () => {
             // console.log(`Skipping player ${localPlayer.name}, no deaths data.`);
             // count++
             continue;
-        }
-
+        }        
+        
         const lastDeath = localPlayer.last_death || null;
         const currentDeath = localPlayer.deaths.deaths[0];
 
@@ -40,6 +41,7 @@ const compareDeaths = async () => {
         if (!lastDeath || lastDeath.time !== currentDeath?.time) {
             differences.push({
                 id: localPlayer.id,
+                memberID: localPlayer.memberID || null,
                 name: localPlayer.name,
                 pvp_type: localPlayer.pvp_type,
                 death: currentDeath || null,
