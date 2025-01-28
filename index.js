@@ -45,6 +45,8 @@ let isRunning = false;
 // Bot Login
 client.once(Events.ClientReady, (readyClient) => {
     console.log(`${readyClient.user.tag} is Ready!`);
+    
+    let randomMessage = utils.mensagemEngracadaDeMorte()
 
     cron.schedule("*/15 * * * * *", async () => {
         if (isRunning) return;
@@ -57,25 +59,30 @@ client.once(Events.ClientReady, (readyClient) => {
             const channelDeaths = client.channels.cache.get(
                 CHANNEL_SERVER_LOGS_ID
             );
-            console.log('Inicia a comparação!')
+            console.log("Inicia a comparação!");
             const deathsLog = await serverLogs.compareDeaths();
-            console.log('Encerra a comparação!')
+            console.log("Encerra a comparação!");
             console.log(`Total de mortes detectadas: ${deathsLog.length}`);
 
             if (deathsLog.length > 0) {
                 if (channelDeaths) {
-                    for (const log of deathsLog) {                      
-                        let playerKilledByID = null
-                        let playerMostDamageByID = null
+                    for (const log of deathsLog) {
+                        let playerKilledByID = null;
+                        let playerMostDamageByID = null;
                         if (log.death.is_player == 1) {
-                          playerKilledByID = await serverLogs.getKillerPlayer(log.death.killed_by)
+                            playerKilledByID = await serverLogs.getKillerPlayer(
+                                log.death.killed_by
+                            );
                         }
 
                         if (
                             log.death.mostdamage_is_player == 1 &&
                             !(log.death.killed_by == log.death.mostdamage_by)
                         ) {
-                          playerMostDamageByID = await serverLogs.getKillerPlayer(log.death.mostdamage_by)
+                            playerMostDamageByID =
+                                await serverLogs.getKillerPlayer(
+                                    log.death.mostdamage_by
+                                );
                         }
 
                         const embed = new EmbedBuilder()
@@ -84,12 +91,12 @@ client.once(Events.ClientReady, (readyClient) => {
                             )
                             .setTitle(
                                 log.pvp_type === "Ally"
-                                    ? "ALLY DIED"
+                                    ? `ALLY DIED`
                                     : "ENEMY DIED"
                             )
                             .setDescription(
                                 log.death.killed_by == log.death.mostdamage_by
-                                    ? `${utils.convertTimestamp(
+                                    ? `${log.pvp_type === "Ally" ? `${log.memberID != null ? `<@!${log.memberID}> ${randomMessage}\n\n` : `${log.name} ${randomMessage}\n\n`}` : "" }` + `${utils.convertTimestamp(
                                           log.death.time
                                       )}  [${
                                           log.name
@@ -100,7 +107,7 @@ client.once(Events.ClientReady, (readyClient) => {
                                               ? `[${log.death.killed_by}](https://saiyansreturn.com/profile/${playerKilledByID}?server=Universe%20Beerus)`
                                               : log.death.killed_by
                                       }`
-                                    : `${utils.convertTimestamp(
+                                    : `${log.pvp_type === "Ally" ? `${log.memberID != null ? `<@!${log.memberID}> ${randomMessage}\n\n` : `${log.name} ${randomMessage}\n\n`}` : "" }` + `${utils.convertTimestamp(
                                           log.death.time
                                       )}  [${
                                           log.name
@@ -117,7 +124,9 @@ client.once(Events.ClientReady, (readyClient) => {
                                       }`
                             );
 
-                        await channelDeaths.send({ embeds: [embed] });
+                        await channelDeaths.send({
+                            embeds: [embed],
+                        });
                     }
                 } else {
                     console.error(
@@ -126,12 +135,12 @@ client.once(Events.ClientReady, (readyClient) => {
                 }
             }
 
-            console.log('Inicia a busca na apiRots!')
+            console.log("Inicia a busca na apiRots!");
             const allPlayers = await rotsApi.findAllPlayersParallel();
-            console.log('Encerra a busca na apiRots!')
-            console.log('Inicia a atualização da base!')
+            console.log("Encerra a busca na apiRots!");
+            console.log("Inicia a atualização da base!");
             await db.updatePlayers(allPlayers);
-            console.log('Encerra a atualização da base!')
+            console.log("Encerra a atualização da base!");
         } catch (error) {
             console.error("Erro durante a execução do cron:", error);
         } finally {

@@ -58,6 +58,6 @@ module.exports = {
             console.error(error)
         }
 
-        await interaction.reply('Enemy inserted')
+        await interaction.reply(`Enemy inserted: ${nickName}`)
     }
 }
