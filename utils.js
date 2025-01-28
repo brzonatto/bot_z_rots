@@ -412,13 +412,12 @@ const formatBonusValue = (bonusValue) => {
 
 const mensagemEngracadaDeMorte = () => {
     const mensagens = [
-        "bateu no inimigo... com a cara!",
-        "tentou... por uns dois segundos!",
-        "apertou o botão errado no momento certo: o combo perfeito para a derrota.",
-        "mamou com vontade!",
-        "faleceu?",
-        "tropeçou, caiu, e a gravidade fez o resto. RIP!",
-        "tentou ser herói, mas virou estatística. Boa tentativa!"
+        "amassou o inimigo... com a cara!",
+        "apertou o botão errado no momento certo!",
+        "não pressentiu o perigo e o caos!",
+        "é um pobre coitado!",
+        "sentiu o verdadeiro terrrrrrooor!",
+        "morreu porque é ruim!"
     ];
 
     const indiceAleatorio = Math.floor(Math.random() * mensagens.length);
