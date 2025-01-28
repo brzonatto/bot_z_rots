@@ -46,7 +46,7 @@ let isRunning = false;
 client.once(Events.ClientReady, (readyClient) => {
     console.log(`${readyClient.user.tag} is Ready!`);
     
-    let randomMessage = utils.mensagemEngracadaDeMorte()
+    
 
     cron.schedule("*/15 * * * * *", async () => {
         if (isRunning) return;
@@ -67,6 +67,7 @@ client.once(Events.ClientReady, (readyClient) => {
             if (deathsLog.length > 0) {
                 if (channelDeaths) {
                     for (const log of deathsLog) {
+                        let randomMessage = utils.mensagemEngracadaDeMorte()
                         let playerKilledByID = null;
                         let playerMostDamageByID = null;
                         if (log.death.is_player == 1) {
