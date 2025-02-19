@@ -1,6 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
 const { createCanvas, loadImage } = require("canvas");
 const path = require("path");
+const tiers = require("./data/tiers");
 
 const setClass = (vocation) => {
     switch (vocation) {
@@ -75,25 +76,31 @@ const makeLevelUpCard = (character) => {
                 `https://saiyansreturn.com/profile/${character.id}?server=Universe%20Beerus`
             )
             .setDescription(
-                `${setClass(character.vocation.name)} - ${character.vocation.name}`
+                `${setClass(character.vocation.name)} - ${
+                    character.vocation.name
+                }`
             )
             .setThumbnail(setTumb(character.vocation.name))
             .addFields({
                 name: "Died now",
                 value: `${convertTimestamp(character.deaths.deaths[0].time)} 
-                                                by ${character.deaths.deaths[0]
-                        .killed_by
-                    } 
-                                                    ${character.deaths.deaths[0]
-                        .killed_by !=
-                        character.deaths.deaths[0]
-                            .mostdamage_by
-                        ? "and " +
-                        character.deaths
-                            .deaths[0]
-                            .mostdamage_by
-                        : ""
-                    }`,
+                                                by ${
+                                                    character.deaths.deaths[0]
+                                                        .killed_by
+                                                } 
+                                                    ${
+                                                        character.deaths
+                                                            .deaths[0]
+                                                            .killed_by !=
+                                                        character.deaths
+                                                            .deaths[0]
+                                                            .mostdamage_by
+                                                            ? "and " +
+                                                              character.deaths
+                                                                  .deaths[0]
+                                                                  .mostdamage_by
+                                                            : ""
+                                                    }`,
             });
         return card;
     } else {
@@ -104,7 +111,9 @@ const makeLevelUpCard = (character) => {
                 `https://saiyansreturn.com/profile/${character.id}?server=Universe%20Beerus`
             )
             .setDescription(
-                `${setClass(character.vocation.name)} - ${character.vocation.name}`
+                `${setClass(character.vocation.name)} - ${
+                    character.vocation.name
+                }`
             )
             .setThumbnail(setTumb(character.vocation.name))
             .addFields(
@@ -151,7 +160,8 @@ const calcWarStatistics = async (
                     .filter((death) => {
                         const deathTime = new Date(death.time);
                         const isPlayerDeath =
-                            death.is_player === 1 || death.mostdamage_is_player === 1;
+                            death.is_player === 1 ||
+                            death.mostdamage_is_player === 1;
                         const isWithinTimeRange =
                             deathTime >= startTime && deathTime <= endTime;
 
@@ -174,7 +184,8 @@ const calcWarStatistics = async (
                     .filter((death) => {
                         const deathTime = new Date(death.time).getTime();
                         const isPlayerDeath =
-                            death.is_player === 1 || death.mostdamage_is_player === 1;
+                            death.is_player === 1 ||
+                            death.mostdamage_is_player === 1;
                         const isWithinTimeRange =
                             deathTime >= startTime && deathTime <= endTime;
 
@@ -186,20 +197,28 @@ const calcWarStatistics = async (
                     })) || [],
         },
     }));
-    
+
     const killStats = playersTwoNames.reduce((acc, player) => {
-        acc[player] = { kills: 0, mostDamage: 0, fullKills: 0, deaths: 0, KDA: 0 };
+        acc[player] = {
+            kills: 0,
+            mostDamage: 0,
+            fullKills: 0,
+            deaths: 0,
+            KDA: 0,
+        };
         return acc;
     }, {});
-    
 
     updatedPlayersTwo.forEach((player) => {
-        
         const relevantDeaths = player.deaths?.deaths.filter(
-            (death) => playersOneNames.includes(death.killed_by) || playersOneNames.includes(death.mostdamage_by)
+            (death) =>
+                playersOneNames.includes(death.killed_by) ||
+                playersOneNames.includes(death.mostdamage_by)
         );
 
-        killStats[player.name].deaths = relevantDeaths ? relevantDeaths.length : 0;
+        killStats[player.name].deaths = relevantDeaths
+            ? relevantDeaths.length
+            : 0;
     });
 
     updatedPlayersOne.forEach((player) => {
@@ -329,8 +348,10 @@ const generateTableImage = async (data) => {
 const countTotalDeathsBy = async (data, players) => {
     const names = players.map((ally) => ally.name);
     return data.reduce((totalDeaths, player) => {
-        console.log(player)
-        const wasKilledBy = names.includes(player.killed_by) || names.includes(player.mostdamage_by);
+        console.log(player);
+        const wasKilledBy =
+            names.includes(player.killed_by) ||
+            names.includes(player.mostdamage_by);
         return totalDeaths + (wasKilledBy ? 1 : 0);
     }, 0);
 };
@@ -406,23 +427,86 @@ const mergeImagesWithStats = async (imageBuffer1, imageBuffer2, stats) => {
 
 const formatBonusValue = (bonusValue) => {
     // Substituir vírgula por ponto
-    const formattedValue = bonusValue.replace(',', '.');
+    const formattedValue = bonusValue.replace(",", ".");
     return formattedValue;
-}
+};
 
 const mensagemEngracadaDeMorte = () => {
     const mensagens = [
         "amassou o inimigo... com a cara!",
-        "apertou o botão errado no momento certo!",
+        "apertou o botão errado no momento certo! R.I.P",
         "não pressentiu o perigo e o caos!",
         "é um pobre coitado!",
         "sentiu o verdadeiro terrrrrrooor!",
-        "morreu porque é ruim!"
+        "morreu porque é ruim!",
+        "morreu mas passa bem!",
+        "só jogu o que sabe!",
     ];
 
     const indiceAleatorio = Math.floor(Math.random() * mensagens.length);
     return mensagens[indiceAleatorio];
+};
+
+function extractBonuses(text) {
+    const regex = /Bonuses:\s*(.*)/;
+    const match = text.match(regex);
+    const texto = match[1];
+
+    const regex2 = /([A-Za-z\s]+(?:\(\%\))?):\s*([+-]?\d+(\.\d+)?)/g;
+    let match1;
+    const bonuses = [];
+    const tiersList = tiers.tiers();
+
+    // Processando cada bônus
+    while ((match1 = regex2.exec(texto)) !== null) {
+        let bonusName = match1[1].trim();
+        let bonusValue = parseFloat(match1[2]);
+
+        // Encontrando o tier correto para cada bônus
+        let bonusTier = "No tier found"; // Valor padrão caso não encontre
+        let adjustedBonusName = bonusName;
+
+        if (bonusName.includes("More") || bonusName.includes("Less")) {
+            adjustedBonusName = "Less/More DMG (%)";
+            bonusName = "Less/More DMG (%)";
+        }
+
+        let rangeMax;
+
+        for (const tierObj of tiersList) {
+            if (tierObj.name.toLowerCase() === adjustedBonusName.toLowerCase()) {
+                for (const [tier, range] of Object.entries(tierObj.tiers)) {
+                    if (bonusValue >= range.Min && bonusValue <= range.Max) {
+                        bonusTier = tier;
+                        rangeMax = range.Max;
+                        break;
+                    }
+
+                    const nextTier = `Tier${parseInt(tier.match(/\d+/)[0]) + 1}`;
+                    if (bonusValue > range.Max && tierObj.tiers[nextTier] && bonusValue < tierObj.tiers[nextTier].Min) {
+                        bonusTier = nextTier;
+                        rangeMax = tierObj.tiers[nextTier].Max;                        
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        bonuses.push({
+            bonus: bonusName,
+            value: bonusValue,
+            tier: bonusTier,
+            proportion: proportion(bonusValue, rangeMax),
+        });
+    }
+
+    return bonuses;
 }
+
+const proportion = (bonusValue, maxValueTier) => {
+    return ((bonusValue / maxValueTier) * 100).toFixed(2);
+};
 
 module.exports = {
     setClass,
@@ -438,5 +522,6 @@ module.exports = {
     mergeImagesWithStats,
     countTotalDeathsBy,
     formatBonusValue,
-    mensagemEngracadaDeMorte
+    mensagemEngracadaDeMorte,
+    extractBonuses,
 };
