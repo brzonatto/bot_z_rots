@@ -39,7 +39,7 @@ const tiers = () => {
             },
         },
         {
-            name: "KI Drain",
+            name: "Ki Drain",
             tiers: {
                 Tier1: { Min: 6, Max: 12 },
                 Tier2: { Min: 16.6, Max: 21 },
@@ -51,7 +51,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Health Regeneration",
+            name: "Health regeneration",
             tiers: {
                 Tier1: { Min: 7, Max: 14 },
                 Tier2: { Min: 14.7, Max: 24.5 },
@@ -63,7 +63,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Ki Regeneration",
+            name: "KI regeneration",
             tiers: {
                 Tier1: { Min: 3, Max: 6 },
                 Tier2: { Min: 6.3, Max: 10.5 },
@@ -86,20 +86,8 @@ const tiers = () => {
                 FutureMax: 384,
             },
         },
-        // {
-        //     name: "Melee Range",
-        //     tiers: {
-        //         Tier1: { Min: 0, Max: 0 },
-        //         Tier2: { Min: 0, Max: 0 },
-        //         Tier3: { Min: 0, Max: 0 },
-        //         Tier4: { Min: 0, Max: 0 },
-        //         Tier5: { Min: 1, Max: 1 },
-        //         Max: 1,
-        //         FutureMax: 1,
-        //     },
-        // },
         {
-            name: "Health %",
+            name: "Health (%)",
             tiers: {
                 Tier1: { Min: 0.4, Max: 0.8 },
                 Tier2: { Min: 0.8, Max: 1.4 },
@@ -111,7 +99,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Ki %",
+            name: "KI (%)",
             tiers: {
                 Tier1: { Min: 0.4, Max: 0.8 },
                 Tier2: { Min: 0.8, Max: 1.4 },
@@ -123,7 +111,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Life Drain %",
+            name: "Life Drain (%)",
             tiers: {
                 Tier1: { Min: 0.5, Max: 1 },
                 Tier2: { Min: 1.05, Max: 1.75 },
@@ -135,7 +123,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Ki Drain %",
+            name: "Ki Drain (%)",
             tiers: {
                 Tier1: { Min: 0.5, Max: 1 },
                 Tier2: { Min: 1.05, Max: 1.75 },
@@ -147,7 +135,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Heal Effectiveness %",
+            name: "Heal effectiveness (%)",
             tiers: {
                 Tier1: { Min: 1.1, Max: 2.2 },
                 Tier2: { Min: 2.31, Max: 3.85 },
@@ -159,7 +147,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Health Regeneration %",
+            name: "Health regeneration (%)",
             tiers: {
                 Tier1: { Min: 0.3, Max: 0.6 },
                 Tier2: { Min: 0.63, Max: 1.05 },
@@ -171,7 +159,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Ki Regeneration %",
+            name: "KI regeneration (%)",
             tiers: {
                 Tier1: { Min: 0.1, Max: 0.2 },
                 Tier2: { Min: 0.21, Max: 0.35 },
@@ -183,7 +171,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Movement Speed %",
+            name: "Movement Speed (%)",
             tiers: {
                 Tier1: { Min: 0.8, Max: 1.6 },
                 Tier2: { Min: 1.68, Max: 2.8 },
@@ -195,7 +183,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Attack Speed %",
+            name: "Attack Speed (%)",
             tiers: {
                 Tier1: { Min: 0.8, Max: 1.6 },
                 Tier2: { Min: 1.68, Max: 2.8 },
@@ -207,7 +195,7 @@ const tiers = () => {
             },
         },
         {
-            name: "CD Reduction %",
+            name: "CD reduction (%)",
             tiers: {
                 Tier1: { Min: 0.8, Max: 1.6 },
                 Tier2: { Min: 1.68, Max: 2.8 },
@@ -219,7 +207,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Ki Reduction %",
+            name: "Ki Reduction (%)",
             tiers: {
                 Tier1: { Min: 1, Max: 2 },
                 Tier2: { Min: 2.1, Max: 3.5 },
@@ -231,7 +219,7 @@ const tiers = () => {
             },
         },
         {
-            name: "DMG Reflect %",
+            name: "DMG Reflect (%)",
             tiers: {
                 Tier1: { Min: 1, Max: 2 },
                 Tier2: { Min: 2.1, Max: 3.5 },
@@ -243,7 +231,7 @@ const tiers = () => {
             },
         },
         {
-            name: "DMG Reduction %",
+            name: "DMG Reduction (%)",
             tiers: {
                 Tier1: { Min: 0.5, Max: 1 },
                 Tier2: { Min: 1.05, Max: 1.75 },
@@ -255,7 +243,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Dodge Chance %",
+            name: "Dodge chance (%)",
             tiers: {
                 Tier1: { Min: 0.5, Max: 1 },
                 Tier2: { Min: 1.05, Max: 1.75 },
@@ -267,7 +255,7 @@ const tiers = () => {
             },
         },
         {
-            name: "DMG %",
+            name: "DMG (%)",
             tiers: {
                 Tier1: { Min: 0.6, Max: 1.2 },
                 Tier2: { Min: 1.26, Max: 2.1 },
@@ -279,7 +267,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Critical Chance %",
+            name: "Critical chance (%)",
             tiers: {
                 Tier1: { Min: 0.4, Max: 0.8 },
                 Tier2: { Min: 0.84, Max: 1.4 },
@@ -291,7 +279,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Tenacity %",
+            name: "Tenacity (%)",
             tiers: {
                 Tier1: { Min: 2, Max: 4 },
                 Tier2: { Min: 4.2, Max: 7 },
@@ -303,7 +291,7 @@ const tiers = () => {
             },
         },
         {
-            name: "Less/More DMG %",
+            name: "Less/More DMG (%)",
             tiers: {
                 Tier1: { Min: 3, Max: 6 },
                 Tier2: { Min: 6.3, Max: 10.5 },
@@ -386,6 +374,51 @@ const convertBonus = (
     return embed;
 };
 
+const convertAllBonus = (bonusArray, statusNamesToConvert) => {
+    const data = tiers(); // Função que retorna os dados dos tiers
+
+    const embed1 = new EmbedBuilder()
+        .setColor("#0099ff")
+        .setTitle("Bonus Details");
+
+    const embed2 = new EmbedBuilder()
+        .setColor("#ff9900")
+        .setTitle("Bonus Conversion");
+
+    bonusArray.forEach(({ bonus, value, tier, proportion }) => {
+        const currentStatus = data.find(item => item.name === bonus);
+        if (!currentStatus) throw new Error("Current status not found");
+
+        const maxValueCurrent = currentStatus.tiers[tier].Max;
+        const percentage = parseFloat(proportion);
+
+        embed1.addFields({
+            name: bonus,
+            value: `Tier **${tier.replace(/[^0-9]/g, "")}** | Value **${value}** | Max **${maxValueCurrent}** | ${percentage.toFixed(2)}%`,
+            inline: false
+        });
+
+        let conversionText = "";
+
+        statusNamesToConvert.forEach(statusNameToConvert => {
+            const targetStatus = data.find(item => item.name === statusNameToConvert);
+            if (!targetStatus) return;
+
+            const maxValueNew = targetStatus.tiers[tier].Max;
+            const newBonusValue = (percentage / 100) * maxValueNew;
+
+            conversionText += `**${statusNameToConvert}** → Max **${maxValueNew}**, New Bonus **${newBonusValue.toFixed(2)}**\n`;
+        });
+
+        if (conversionText) {
+            embed2.addFields({ name: bonus, value: conversionText, inline: false });
+        }
+    });
+
+    return [embed1, embed2];
+};
+
+
 const getStatusInfoEmbed = (statusName) => {
     // Dados
     const data = tiers()
@@ -423,5 +456,6 @@ const getStatusInfoEmbed = (statusName) => {
 module.exports = {
     tiers,
     convertBonus,
-    getStatusInfoEmbed
+    getStatusInfoEmbed,
+    convertAllBonus
 };

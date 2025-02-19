@@ -11,6 +11,32 @@ const getKillerPlayer = async (nickname) => {
     return playerID.id
 };
 
+const compareNames = async () => {
+    const localPlayers = await db.findAll();
+    const differences = [];
+
+    for (const localPlayer of localPlayers) {
+        // Inicializa old_names como um array vazio caso não exista
+        const oldNames = localPlayer.old_names || [];
+
+        if (localPlayer.name !== oldNames[0]) {
+            differences.push({
+                currentName: localPlayer.name,
+                oldName: oldNames[0],
+            });
+            
+            const updatedOldNames = [localPlayer.name, ...oldNames];
+
+            await db.update(
+                { id: localPlayer.id },
+                { old_names: updatedOldNames }
+            );            
+        }
+    }
+
+    return differences;
+};
+
 const compareDeaths = async () => {
     const localPlayers = await db.findAll();
     const differences = [];
@@ -62,4 +88,5 @@ const compareDeaths = async () => {
 module.exports = {
     compareDeaths,
     getKillerPlayer,
+    compareNames
 };
