@@ -45,8 +45,6 @@ let isRunning = false;
 // Bot Login
 client.once(Events.ClientReady, (readyClient) => {
     console.log(`${readyClient.user.tag} is Ready!`);
-    
-    
 
     cron.schedule("*/15 * * * * *", async () => {
         if (isRunning) return;
@@ -59,15 +57,19 @@ client.once(Events.ClientReady, (readyClient) => {
             const channelDeaths = client.channels.cache.get(
                 CHANNEL_SERVER_LOGS_ID
             );
-            console.log("Inicia a comparação!");
+            console.log("Inicia a comparação de mortes!");
             const deathsLog = await serverLogs.compareDeaths();
-            console.log("Encerra a comparação!");
+            console.log("Encerra a comparaçãomortes!");
             console.log(`Total de mortes detectadas: ${deathsLog.length}`);
+            console.log("Inicia a comparação de nomes!");
+            const namesLog = await serverLogs.compareNames();
+            console.log("Encerra a comparação de nomes!");
+            console.log(`Total de nomes alterados: ${namesLog.length}`);
 
             if (deathsLog.length > 0) {
                 if (channelDeaths) {
                     for (const log of deathsLog) {
-                        let randomMessage = utils.mensagemEngracadaDeMorte()
+                        let randomMessage = utils.mensagemEngracadaDeMorte();
                         let playerKilledByID = null;
                         let playerMostDamageByID = null;
                         if (log.death.is_player == 1) {
@@ -97,32 +99,72 @@ client.once(Events.ClientReady, (readyClient) => {
                             )
                             .setDescription(
                                 log.death.killed_by == log.death.mostdamage_by
-                                    ? `${log.pvp_type === "Ally" ? `${log.memberID != null ? `<@!${log.memberID}> ${randomMessage}\n\n` : `${log.name} ${randomMessage}\n\n`}` : "" }` + `${utils.convertTimestamp(
-                                          log.death.time
-                                      )}  [${
-                                          log.name
-                                      }](https://saiyansreturn.com/profile/${
-                                          log.id
-                                      }?server=Universe%20Beerus): Killed by ${
-                                          log.death.is_player == 1
-                                              ? `[${log.death.killed_by}](https://saiyansreturn.com/profile/${playerKilledByID}?server=Universe%20Beerus)`
-                                              : log.death.killed_by
-                                      }`
-                                    : `${log.pvp_type === "Ally" ? `${log.memberID != null ? `<@!${log.memberID}> ${randomMessage}\n\n` : `${log.name} ${randomMessage}\n\n`}` : "" }` + `${utils.convertTimestamp(
-                                          log.death.time
-                                      )}  [${
-                                          log.name
-                                      }](https://saiyansreturn.com/profile/${
-                                          log.id
-                                      }?server=Universe%20Beerus): Killed by ${
-                                          log.death.is_player == 1
-                                              ? `[${log.death.killed_by}](https://saiyansreturn.com/profile/${playerKilledByID}?server=Universe%20Beerus)`
-                                              : log.death.killed_by
-                                      } and ${
-                                          log.death.mostdamage_is_player == 1
-                                              ? `[${log.death.mostdamage_by}](https://saiyansreturn.com/profile/${playerMostDamageByID}?server=Universe%20Beerus)`
-                                              : log.death.mostdamage_by
-                                      }`
+                                    ? `${
+                                          log.pvp_type === "Ally"
+                                              ? `${
+                                                    log.memberID != null
+                                                        ? `<@!${log.memberID}> ${randomMessage}\n\n`
+                                                        : `${log.name} ${randomMessage}\n\n`
+                                                }`
+                                              : ""
+                                      }` +
+                                          `${utils.convertTimestamp(
+                                              log.death.time
+                                          )}  [${
+                                              log.name
+                                          }](https://saiyansreturn.com/profile/${
+                                              log.id
+                                          }?server=Universe%20Beerus): Killed by ${
+                                              log.death.is_player == 1
+                                                  ? `[${log.death.killed_by}](https://saiyansreturn.com/profile/${playerKilledByID}?server=Universe%20Beerus)`
+                                                  : log.death.killed_by
+                                          }`
+                                    : `${
+                                          log.pvp_type === "Ally"
+                                              ? `${
+                                                    log.memberID != null
+                                                        ? `<@!${log.memberID}> ${randomMessage}\n\n`
+                                                        : `${log.name} ${randomMessage}\n\n`
+                                                }`
+                                              : ""
+                                      }` +
+                                          `${utils.convertTimestamp(
+                                              log.death.time
+                                          )}  [${
+                                              log.name
+                                          }](https://saiyansreturn.com/profile/${
+                                              log.id
+                                          }?server=Universe%20Beerus): Killed by ${
+                                              log.death.is_player == 1
+                                                  ? `[${log.death.killed_by}](https://saiyansreturn.com/profile/${playerKilledByID}?server=Universe%20Beerus)`
+                                                  : log.death.killed_by
+                                          } and ${
+                                              log.death.mostdamage_is_player ==
+                                              1
+                                                  ? `[${log.death.mostdamage_by}](https://saiyansreturn.com/profile/${playerMostDamageByID}?server=Universe%20Beerus)`
+                                                  : log.death.mostdamage_by
+                                          }`
+                            );
+
+                        await channelDeaths.send({
+                            embeds: [embed],
+                        });
+                    }
+                } else {
+                    console.error(
+                        "Canal não encontrado. Verifique se CHANNEL_SERVER_LOGS_ID está correto no arquivo .env."
+                    );
+                }
+            }
+
+            if (namesLog.length > 0) {
+                if (channelDeaths) {
+                    for (const log of namesLog) {
+                        const embed = new EmbedBuilder()
+                            .setColor("#FFA500")
+                            .setTitle("NAME CHANGE")
+                            .setDescription(
+                                `Name changed from ${log.oldName} to ${log.currentName}.`
                             );
 
                         await channelDeaths.send({
