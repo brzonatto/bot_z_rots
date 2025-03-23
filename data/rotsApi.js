@@ -2,41 +2,57 @@ const db = require("../data/db");
 const pLimit = require('p-limit');
 
 const findByName = async (nickName) => {
-    let player
-    await fetch(`https://api.saiyansreturn.com/characters?server=Universe%20Beerus&name=${nickName}&limit=1`)
-            .then(response => response.json())    
-            .then(data => {
-                player = data
-            })
-            .catch(error => console.error(error))
+    let player;
+    await fetch(`https://api.saiyansreturn.com/characters?server=Universe%20Beerus&name=${nickName}&limit=1`, {
+        method: "GET",
+        headers: {
+            "User-Agent": "PostmanRuntime/7.42.0"
+        }
+    })
+    .then(response => response.json())    
+    .then(data => {
+        player = data;
+    })
+    .catch(error => console.error(error));
             
-            return player
-}
+    return player;
+};
 
        
 const findPlayerByID = async (playerID) => {
-    let player
-    await fetch(`https://api.saiyansreturn.com/profile/${playerID}?server=Universe%20Beerus`)
-        .then(response => response.json())
-        .then(data => {
-            player = data
-        })
-        .catch(error => console.error(error))
+    let player;
+    await fetch(`https://api.saiyansreturn.com/profile/${playerID}?server=Universe%20Beerus`, {
+        method: "GET",
+        headers: {
+            "User-Agent": "PostmanRuntime/7.42.0"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        player = data;
+    })
+    .catch(error => console.error(error));
 
-        return player
-}
+    return player;
+};
 
 const findAllPlayersParallel = async () => {
     const allPlayersInDB = await db.findAll(); // Busca todos os jogadores no banco de dados
-    const limit = pLimit(15); // Limita a 20 requisições simultâneas
+    const limit = pLimit(15); // Limita a 15 requisições simultâneas
 
     const promises = allPlayersInDB.map(player =>
         limit(async () => {
             try {
-                const response = await fetch(`https://api.saiyansreturn.com/profile/${player.id}?server=Universe%20Beerus`);
+                const response = await fetch(`https://api.saiyansreturn.com/profile/${player.id}?server=Universe%20Beerus`, {
+                    method: "GET",
+                    headers: {
+                        "User-Agent": "PostmanRuntime/7.42.0"
+                    }
+                });
+
                 const updatedPlayer = await response.json();
                 return { id: player.id, ...updatedPlayer };
-            } catch (error) {
+            } catch (error) {                
                 console.error(`Erro ao buscar dados para o ID ${player.id}:`, error);
                 return null; // Retorna null em caso de erro
             }
@@ -46,6 +62,7 @@ const findAllPlayersParallel = async () => {
     const updatedPlayers = (await Promise.all(promises)).filter(player => player !== null);
     return updatedPlayers; // Retorna a lista com os jogadores atualizados
 };
+
 
 const findAllPlayers = async () => {
     const allPlayersInDB = await db.findAll(); // Busca todos os jogadores no banco de dados
