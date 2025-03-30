@@ -1,102 +1,105 @@
 const db = require("../data/db");
-const pLimit = require('p-limit');
+const pLimit = require("p-limit");
+const got = require("got").default;
 
+const API_URL = "https://api.saiyansreturn.com";
+const SERVER_NAME = "Universe Beerus";
+const HEADERS = {
+    "User-Agent": "PostmanRuntime/7.43.2",
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive"
+};
+
+// 🔍 Busca jogador pelo nome
 const findByName = async (nickName) => {
-    let player;
-    await fetch(`https://api.saiyansreturn.com/characters?server=Universe%20Beerus&name=${nickName}&limit=1`, {
-        method: "GET",
-        headers: {
-            "User-Agent": "PostmanRuntime/7.42.0"
-        }
-    })
-    .then(response => response.json())    
-    .then(data => {
-        player = data;
-    })
-    .catch(error => console.error(error));
-            
-    return player;
+    try {
+        return await got(`${API_URL}/characters`, {
+            searchParams: { server: SERVER_NAME, name: nickName, limit: 1 },
+            headers: HEADERS,
+            responseType: "json"
+        }).json();
+    } catch (error) {
+        console.error(`Erro ao buscar jogador por nome (${nickName}):`, error.message);
+        return null;
+    }
 };
 
-       
+// 🔍 Busca jogador pelo ID
 const findPlayerByID = async (playerID) => {
-    let player;
-    await fetch(`https://api.saiyansreturn.com/profile/${playerID}?server=Universe%20Beerus`, {
-        method: "GET",
-        headers: {
-            "User-Agent": "PostmanRuntime/7.42.0"
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        player = data;
-    })
-    .catch(error => console.error(error));
-
-    return player;
+    try {
+        return await got(`${API_URL}/profile/${playerID}`, {
+            searchParams: { server: SERVER_NAME },
+            headers: HEADERS,
+            responseType: "json"
+        }).json();
+    } catch (error) {
+        console.error(`Erro ao buscar jogador por ID (${playerID}):`, error.message);
+        return null;
+    }
 };
 
+// 🔄 Busca todos os jogadores em paralelo (com limite)
 const findAllPlayersParallel = async () => {
-    const allPlayersInDB = await db.findAll(); // Busca todos os jogadores no banco de dados
-    const limit = pLimit(15); // Limita a 15 requisições simultâneas
+    const allPlayersInDB = await db.findAll(); // Busca todos os jogadores no banco
+    const limit = pLimit(10); // Limita a 5 requisições simultâneas
+    let countError = 0;
+    let countAccepted = 0;
 
     const promises = allPlayersInDB.map(player =>
         limit(async () => {
             try {
-                const response = await fetch(`https://api.saiyansreturn.com/profile/${player.id}?server=Universe%20Beerus`, {
-                    method: "GET",
-                    headers: {
-                        "User-Agent": "PostmanRuntime/7.42.0"
-                    }
-                });
+                const updatedPlayer = await got(`${API_URL}/profile/${player.id}`, {
+                    searchParams: { server: SERVER_NAME },
+                    headers: HEADERS,
+                    responseType: "json"
+                }).json();
 
-                const updatedPlayer = await response.json();
+                countAccepted++;
                 return { id: player.id, ...updatedPlayer };
-            } catch (error) {                
-                console.error(`Erro ao buscar dados para o ID ${player.id}:`, error);
-                return null; // Retorna null em caso de erro
+            } catch (error) {
+                countError++;
+                console.error(`Erro ao buscar dados para ID ${player.id}:`, error.message);
+                return null;
             }
         })
     );
 
     const updatedPlayers = (await Promise.all(promises)).filter(player => player !== null);
-    return updatedPlayers; // Retorna a lista com os jogadores atualizados
+    
+    console.log(`Get API accepted: ${countAccepted}/${allPlayersInDB.length}`);
+    console.log(`Get API error: ${countError}/${allPlayersInDB.length}`);
+    
+    return updatedPlayers;
 };
 
-
+// 🔄 Busca todos os jogadores (um por um)
 const findAllPlayers = async () => {
-    const allPlayersInDB = await db.findAll(); // Busca todos os jogadores no banco de dados
-    const updatedPlayers = []; // Lista para armazenar os jogadores atualizados
-    // let count = 1
+    const allPlayersInDB = await db.findAll();
+    const updatedPlayers = [];
 
     for (const player of allPlayersInDB) {
         try {
-            // Busca os dados atualizados do jogador na API
-            const updatedPlayer = await fetch(`https://api.saiyansreturn.com/profile/${player.id}?server=Universe%20Beerus`)
-                .then(response => response.json())
-                .catch(error => {
-                    console.error(`Erro ao buscar dados para o ID ${player.id}:`, error);
-                    return null; // Retorna null se houver erro
-                });
+            const updatedPlayer = await got(`${API_URL}/profile/${player.id}`, {
+                searchParams: { server: SERVER_NAME },
+                headers: HEADERS,
+                responseType: "json"
+            }).json();
 
             if (updatedPlayer) {
-                // Adiciona os dados atualizados à lista
                 updatedPlayers.push({ id: player.id, ...updatedPlayer });
-                // console.log(`Get rotsApi: ${count}/${allPlayersInDB.length}`)
-                // count++
             }
         } catch (error) {
-            console.error(`Erro ao processar o jogador ${player.id}:`, error);
+            console.error(`Erro ao buscar dados para ID ${player.id}:`, error.message);
         }
     }
 
-    return updatedPlayers; // Retorna a lista com os jogadores atualizados
+    return updatedPlayers;
 };
-
 
 module.exports = {
     findByName,
     findPlayerByID,
     findAllPlayers,
-    findAllPlayersParallel  
-}
+    findAllPlayersParallel
+};
