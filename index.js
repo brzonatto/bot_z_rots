@@ -46,7 +46,7 @@ let isRunning = false;
 client.once(Events.ClientReady, (readyClient) => {
     console.log(`${readyClient.user.tag} is Ready!`);
 
-    cron.schedule("*/15 * * * * *", async () => {
+    cron.schedule("*/50 * * * * *", async () => {
         if (isRunning) return;
 
         isRunning = true;
