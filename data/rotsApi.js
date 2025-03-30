@@ -1,10 +1,11 @@
 const db = require("../data/db");
 const pLimit = require("p-limit");
 
+const TIME_DELAY = 8000; // Tempo de espera entre as requisições (8 segundos)
 const API_URL = "https://api.saiyansreturn.com";
 const SERVER_NAME = "Universe Beerus";
 const HEADERS = {
-    "User-Agent": "PostmanRuntime/7.43.2",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 Edg/134.0.0.0 PostmanRuntime/7.43.2",
     "Accept": "*/*",
     "Accept-Encoding": "gzip, deflate, br",
     "Connection": "keep-alive"
@@ -14,7 +15,7 @@ const HEADERS = {
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // 🔍 Função que faz a requisição com retry automático
-const fetchWithRetry = async (url, retries = 5, delay = 1000) => {
+const fetchWithRetry = async (url, retries = 5, delay = 20000) => {
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
             const response = await fetch(url, { method: "GET", headers: HEADERS });
@@ -22,12 +23,16 @@ const fetchWithRetry = async (url, retries = 5, delay = 1000) => {
             if (response.status === 429) {
                 console.warn(`Erro 429 - Tentativa em ${url} ${attempt}/${retries}. Aguardando ${delay}ms...`);
                 await wait(delay);
-                delay *= 2; // Aumenta o tempo de espera (exponencial)
+                // delay *= 2; // Aumenta o tempo de espera (exponencial)
                 continue;
             }
 
             if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-            return await response.json();
+
+            if (response.ok && response.status == 200) {
+                console.warn(`Accepted ${response.status} - Tentativa em ${url}`);
+                return await response.json();
+            }
         } catch (error) {
             console.error(`Erro na requisição (${url}): ${error.message}`);
             if (attempt === retries) return null; // Se esgotar as tentativas, retorna null
@@ -38,6 +43,10 @@ const fetchWithRetry = async (url, retries = 5, delay = 1000) => {
 // 🔍 Busca jogador pelo nome
 const findByName = async (nickName) => {
     const url = `${API_URL}/characters?server=${encodeURIComponent(SERVER_NAME)}&name=${encodeURIComponent(nickName)}&limit=1`;
+
+    // Aguardar 5 segundos antes de fazer a próxima requisição
+    await delay(TIME_DELAY);
+
     return await fetchWithRetry(url);
 };
 
@@ -50,12 +59,15 @@ const findPlayerByID = async (playerID) => {
 // 🔄 Busca todos os jogadores em paralelo (com limite)
 const findAllPlayersParallel = async () => {
     const allPlayersInDB = await db.findAll();
-    const limit = pLimit(3); // Máximo de 3 requisições simultâneas
+    const limit = pLimit(2); // Máximo de 2 requisições simultâneas
     let countError = 0;
     let countAccepted = 0;
 
     const promises = allPlayersInDB.map(player =>
         limit(async () => {
+            // Aguardar 8 segundos antes de fazer a requisição
+            await delay(TIME_DELAY);
+
             const url = `${API_URL}/profile/${player.id}?server=${encodeURIComponent(SERVER_NAME)}`;
             const updatedPlayer = await fetchWithRetry(url);
 
@@ -77,13 +89,20 @@ const findAllPlayersParallel = async () => {
     return updatedPlayers;
 };
 
-// 🔄 Busca todos os jogadores (um por um)
+// Função para criar um delay
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// 🔄 Busca todos os jogadores (um por um) com delay
 const findAllPlayers = async () => {
     const allPlayersInDB = await db.findAll();
     const updatedPlayers = [];
 
     for (const player of allPlayersInDB) {
         const url = `${API_URL}/profile/${player.id}?server=${encodeURIComponent(SERVER_NAME)}`;
+        
+        // Aguardar 5 segundos antes de fazer a próxima requisição
+        await delay(TIME_DELAY); 
+
         const updatedPlayer = await fetchWithRetry(url);
 
         if (updatedPlayer) {
