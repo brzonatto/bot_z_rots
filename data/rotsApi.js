@@ -1,6 +1,5 @@
 const db = require("../data/db");
 const pLimit = require("p-limit");
-const got = require("got").default;
 
 const API_URL = "https://api.saiyansreturn.com";
 const SERVER_NAME = "Universe Beerus";
@@ -11,65 +10,70 @@ const HEADERS = {
     "Connection": "keep-alive"
 };
 
+// 🔄 Função para esperar antes de tentar novamente (Exponential Backoff)
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+// 🔍 Função que faz a requisição com retry automático
+const fetchWithRetry = async (url, retries = 5, delay = 1000) => {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            const response = await fetch(url, { method: "GET", headers: HEADERS });
+
+            if (response.status === 429) {
+                console.warn(`Erro 429 - Tentativa em ${url} ${attempt}/${retries}. Aguardando ${delay}ms...`);
+                await wait(delay);
+                delay *= 2; // Aumenta o tempo de espera (exponencial)
+                continue;
+            }
+
+            if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            console.error(`Erro na requisição (${url}): ${error.message}`);
+            if (attempt === retries) return null; // Se esgotar as tentativas, retorna null
+        }
+    }
+};
+
 // 🔍 Busca jogador pelo nome
 const findByName = async (nickName) => {
-    try {
-        return await got(`${API_URL}/characters`, {
-            searchParams: { server: SERVER_NAME, name: nickName, limit: 1 },
-            headers: HEADERS,
-            responseType: "json"
-        }).json();
-    } catch (error) {
-        console.error(`Erro ao buscar jogador por nome (${nickName}):`, error.message);
-        return null;
-    }
+    const url = `${API_URL}/characters?server=${encodeURIComponent(SERVER_NAME)}&name=${encodeURIComponent(nickName)}&limit=1`;
+    return await fetchWithRetry(url);
 };
 
 // 🔍 Busca jogador pelo ID
 const findPlayerByID = async (playerID) => {
-    try {
-        return await got(`${API_URL}/profile/${playerID}`, {
-            searchParams: { server: SERVER_NAME },
-            headers: HEADERS,
-            responseType: "json"
-        }).json();
-    } catch (error) {
-        console.error(`Erro ao buscar jogador por ID (${playerID}):`, error.message);
-        return null;
-    }
+    const url = `${API_URL}/profile/${playerID}?server=${encodeURIComponent(SERVER_NAME)}`;
+    return await fetchWithRetry(url);
 };
 
 // 🔄 Busca todos os jogadores em paralelo (com limite)
 const findAllPlayersParallel = async () => {
-    const allPlayersInDB = await db.findAll(); // Busca todos os jogadores no banco
-    const limit = pLimit(10); // Limita a 5 requisições simultâneas
+    const allPlayersInDB = await db.findAll();
+    const limit = pLimit(3); // Máximo de 3 requisições simultâneas
     let countError = 0;
     let countAccepted = 0;
 
     const promises = allPlayersInDB.map(player =>
         limit(async () => {
-            try {
-                const updatedPlayer = await got(`${API_URL}/profile/${player.id}`, {
-                    searchParams: { server: SERVER_NAME },
-                    headers: HEADERS,
-                    responseType: "json"
-                }).json();
+            const url = `${API_URL}/profile/${player.id}?server=${encodeURIComponent(SERVER_NAME)}`;
+            const updatedPlayer = await fetchWithRetry(url);
 
+            if (updatedPlayer) {
                 countAccepted++;
                 return { id: player.id, ...updatedPlayer };
-            } catch (error) {
+            } else {
                 countError++;
-                console.error(`Erro ao buscar dados para ID ${player.id}:`, error.message);
                 return null;
             }
         })
     );
 
     const updatedPlayers = (await Promise.all(promises)).filter(player => player !== null);
-    
+
     console.log(`Get API accepted: ${countAccepted}/${allPlayersInDB.length}`);
     console.log(`Get API error: ${countError}/${allPlayersInDB.length}`);
-    
+
     return updatedPlayers;
 };
 
@@ -79,18 +83,11 @@ const findAllPlayers = async () => {
     const updatedPlayers = [];
 
     for (const player of allPlayersInDB) {
-        try {
-            const updatedPlayer = await got(`${API_URL}/profile/${player.id}`, {
-                searchParams: { server: SERVER_NAME },
-                headers: HEADERS,
-                responseType: "json"
-            }).json();
+        const url = `${API_URL}/profile/${player.id}?server=${encodeURIComponent(SERVER_NAME)}`;
+        const updatedPlayer = await fetchWithRetry(url);
 
-            if (updatedPlayer) {
-                updatedPlayers.push({ id: player.id, ...updatedPlayer });
-            }
-        } catch (error) {
-            console.error(`Erro ao buscar dados para ID ${player.id}:`, error.message);
+        if (updatedPlayer) {
+            updatedPlayers.push({ id: player.id, ...updatedPlayer });
         }
     }
 
