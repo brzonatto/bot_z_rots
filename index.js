@@ -109,7 +109,7 @@ client.once(Events.ClientReady, (readyClient) => {
                                               : ""
                                       }` +
                                           `${utils.convertTimestamp(
-                                              log.death.time
+                                              log.death.time - 10800
                                           )}  [${
                                               log.name
                                           }](https://saiyansreturn.com/profile/${
@@ -129,7 +129,7 @@ client.once(Events.ClientReady, (readyClient) => {
                                               : ""
                                       }` +
                                           `${utils.convertTimestamp(
-                                              log.death.time
+                                              log.death.time - 10800
                                           )}  [${
                                               log.name
                                           }](https://saiyansreturn.com/profile/${

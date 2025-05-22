@@ -43,7 +43,7 @@ module.exports = {
                 .setDescription(`${utils.setClass(character.vocation.name)} - ${character.vocation.name}`)
                 .setThumbnail(utils.setTumb(character.vocation.name))
                 .addFields(
-                    { name: 'Last login', value: `${utils.convertTimestamp(character.last_login)}`, inline: true },
+                    { name: 'Last login', value: `${utils.convertTimestamp(character.last_login - 10800)}`, inline: true },
                     { name: '\u200B', value: '\u200B' },
                     { name: 'Fist', value: `${character.skills.fist.level}`, inline: true },
                     { name: 'Focus', value: `${character.skills.focus.level}`, inline: true },
@@ -62,7 +62,7 @@ module.exports = {
                             const mostDamageBy = death.mostdamage_by && death.mostdamage_by !== killedBy
                                 ? ` and ${death.mostdamage_by}`
                                 : '';
-                            return `${utils.convertTimestamp(death.time)} by ${killedBy}${mostDamageBy}`;
+                            return `${utils.convertTimestamp(death.time - 10800)} by ${killedBy}${mostDamageBy}`;
                         }).filter(Boolean).join('\n') || 'No deaths recorded',
                     }
                 );
