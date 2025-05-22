@@ -56,14 +56,14 @@ module.exports = {
             const statsAlliesResult = await utils.calcWarStatistics(
                 enemies,
                 allies,
-                startTime,
-                endTime
+                startTime + 10800,
+                endTime + 10800
             );
             const statsEnemmiesResult = await utils.calcWarStatistics(
                 allies,
                 enemies,
-                startTime,
-                endTime
+                startTime + 10800,
+                endTime + 10800
             );
 
             const imageBufferAllies = await utils.generateTableImage(statsAlliesResult);
