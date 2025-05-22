@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, MessageFlags } = require("discord.js");
 const db = require("../data/db");
 const rotsApi = require("../data/rotsApi");
 const dotenv = require("dotenv");
@@ -19,7 +19,6 @@ module.exports = {
             option
                 .setName("idmember")
                 .setDescription("ID discord member.")
-                .setRequired(true)
         ),
 
     async execute(interaction) {
@@ -27,44 +26,47 @@ module.exports = {
         if (!memberRoles.cache.has(REQUIRED_ROLE_ID)) {
             return await interaction.reply({
                 content: `You do not have the required role to use this command.`,
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
 
         if (interaction.channelId !== CHANNEL_ADMIN_COMMANDS_ID) {
             return await interaction.reply({
                 content: `This command can only be used in the channel <#${CHANNEL_ADMIN_COMMANDS_ID}>.`,
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
             });
         }
 
+        await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+
         const nickName = interaction.options.getString("nickname");
         const memberID = interaction.options.getString("idmember");
-        const playerFirstFind = await rotsApi.findByName(nickName);
-        if (playerFirstFind.length < 1)
-            return await interaction.reply("Character not found.");
-        const character = await rotsApi.findPlayerByID(playerFirstFind[0].id);
 
         try {
+            const playerFirstFind = await rotsApi.findByName(nickName);
+            if (!playerFirstFind || playerFirstFind.length < 1) {
+                return await interaction.editReply("❌ Character not found.");
+            }
+
+            const character = await rotsApi.findPlayerByID(playerFirstFind[0].id);
             const ifIDExists = await db.findPlayerByID(character.id);
 
             if (ifIDExists) {
                 const pvpType = await db.findTypePlayerByID(character.id);
-                if (pvpType == "Enemy")
-                    return await interaction.reply(
-                        "This player already registered as Enemy."
-                    );
-                if (ifIDExists)
-                    return await interaction.reply("Ally already registered.");
-            } else {
-                character.memberID = memberID
-                character.pvp_type = "Ally";
-                await db.insert(character);
+                if (pvpType === "Enemy") {
+                    return await interaction.editReply("⚠️ This player is already registered as Enemy.");
+                }
+                return await interaction.editReply("⚠️ Ally already registered.");
             }
-        } catch (error) {
-            console.error(error);
-        }
 
-        await interaction.reply(`Ally inserted: ${nickName}`);
+            character.memberID = memberID;
+            character.pvp_type = "Ally";
+            await db.insert(character);
+
+            return await interaction.editReply(`✅ Ally inserted: **${nickName}**`);
+        } catch (error) {
+            console.error("Erro ao adicionar Ally:", error);
+            return await interaction.editReply("❌ An error occurred while inserting the ally.");
+        }
     },
 };
