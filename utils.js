@@ -146,6 +146,9 @@ const calcWarStatistics = async (
     endTime,
     enemyGuild = null
 ) => {
+
+    console.log('startTime', startTime);
+    console.log('endTime', endTime);
     // ally
     const playersTwoNames = playersTwo.map((player) => player.name);
     const playersOneNames = playersOne.map((player) => player.name);
