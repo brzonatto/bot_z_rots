@@ -65,6 +65,10 @@ client.once(Events.ClientReady, (readyClient) => {
             const namesLog = await serverLogs.compareNames();
             console.log("Encerra a comparação de nomes!");
             console.log(`Total de nomes alterados: ${namesLog.length}`);
+            const vocationLogs = await serverLogs.compareVocations();
+            console.log(
+                `Total de vocações alteradas: ${vocationLogs.length}`
+            );
 
             if (deathsLog.length > 0) {
                 if (channelDeaths) {
@@ -165,6 +169,27 @@ client.once(Events.ClientReady, (readyClient) => {
                             .setTitle("NAME CHANGE")
                             .setDescription(
                                 `Name changed from ${log.oldName} to ${log.currentName}.`
+                            );
+
+                        await channelDeaths.send({
+                            embeds: [embed],
+                        });
+                    }
+                } else {
+                    console.error(
+                        "Canal não encontrado. Verifique se CHANNEL_SERVER_LOGS_ID está correto no arquivo .env."
+                    );
+                }
+            }
+
+            if (vocationLogs.length > 0) {
+                if (channelDeaths) {
+                    for (const log of vocationLogs) {
+                        const embed = new EmbedBuilder()
+                            .setColor("#FFA500")
+                            .setTitle(`VOCATION CHANGE`)
+                            .setDescription(
+                                `${log.name} lv. ${log.currentLevel} - Changed from ${log.currentVocationName} to ${log.changedVocationName}.`
                             );
 
                         await channelDeaths.send({

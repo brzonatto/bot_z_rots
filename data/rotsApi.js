@@ -73,11 +73,13 @@ const findAllPlayersParallel = async () => {
 
             if (updatedPlayer) {
                 countAccepted++;
+                console.log(`${countAccepted}/${allPlayersInDB.length}`);
                 return { id: player.id, ...updatedPlayer };
             } else {
                 countError++;
                 return null;
             }
+
         })
     );
 

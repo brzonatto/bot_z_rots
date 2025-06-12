@@ -37,6 +37,38 @@ const compareNames = async () => {
     return differences;
 };
 
+const compareVocations = async () => {
+    const localPlayers = await db.findAll();
+    const differences = [];
+
+    for (const localPlayer of localPlayers) {
+        // Inicializa lastVocation como um array vazio caso não exista
+        const lastVocation = localPlayer.last_vocation || null;
+
+        if (localPlayer.vocation.name !== lastVocation?.vocationName) {
+            differences.push({
+                name: localPlayer.name,
+                currentVocationName: localPlayer.vocation.name,
+                changedVocationName: lastVocation?.vocationName,
+                currentLevel: localPlayer.level,
+                changedLevel: lastVocation?.level,
+            });
+
+            const updatedLastVocation = {
+                vocationName: localPlayer.vocation.name,
+                level: localPlayer.level,
+            };
+
+            await db.update(
+                { id: localPlayer.id },
+                { last_vocation: updatedLastVocation }
+            );            
+        }
+    }
+
+    return differences;
+};
+
 const compareDeaths = async () => {
     const localPlayers = await db.findAll();
     const differences = [];
@@ -88,5 +120,6 @@ const compareDeaths = async () => {
 module.exports = {
     compareDeaths,
     getKillerPlayer,
-    compareNames
+    compareNames,
+    compareVocations
 };
