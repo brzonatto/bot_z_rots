@@ -189,7 +189,7 @@ client.once(Events.ClientReady, (readyClient) => {
                             .setColor("#FFA500")
                             .setTitle(`VOCATION CHANGE`)
                             .setDescription(
-                                `${log.name} lv. ${log.currentLevel} - Changed from ${log.currentVocationName} to ${log.changedVocationName}.`
+                                `${log.name} lv. ${log.currentLevel} - Changed from ${log.changedVocationName} to ${log.currentVocationName}.`
                             );
 
                         await channelDeaths.send({
