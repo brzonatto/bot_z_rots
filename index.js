@@ -15,7 +15,7 @@ const utils = require("./utils.js");
 // dotenv
 const dotenv = require("dotenv");
 dotenv.config();
-const { TOKEN, CHANNEL_SERVER_LOGS_ID } = process.env;
+const { TOKEN, CHANNEL_SERVER_LOGS_ID, CHANNEL_CHANGE_LOGS_ID } = process.env;
 
 // commands import
 const fs = require("node:fs");
@@ -56,6 +56,9 @@ client.once(Events.ClientReady, (readyClient) => {
         try {
             const channelDeaths = client.channels.cache.get(
                 CHANNEL_SERVER_LOGS_ID
+            );
+            const channelChanges = client.channels.cache.get(
+                CHANNEL_CHANGE_LOGS_ID
             );
             console.log("Inicia a comparação de mortes!");
             const deathsLog = await serverLogs.compareDeaths();
@@ -162,7 +165,7 @@ client.once(Events.ClientReady, (readyClient) => {
             }
 
             if (namesLog.length > 0) {
-                if (channelDeaths) {
+                if (channelChanges) {
                     for (const log of namesLog) {
                         const embed = new EmbedBuilder()
                             .setColor("#FFA500")
@@ -171,7 +174,7 @@ client.once(Events.ClientReady, (readyClient) => {
                                 `Name changed from ${log.oldName} to ${log.currentName}.`
                             );
 
-                        await channelDeaths.send({
+                        await channelChanges.send({
                             embeds: [embed],
                         });
                     }
@@ -183,7 +186,7 @@ client.once(Events.ClientReady, (readyClient) => {
             }
 
             if (vocationLogs.length > 0) {
-                if (channelDeaths) {
+                if (channelChanges) {
                     for (const log of vocationLogs) {
                         const embed = new EmbedBuilder()
                             .setColor("#FFA500")
@@ -192,7 +195,7 @@ client.once(Events.ClientReady, (readyClient) => {
                                 `${log.name} lv. ${log.currentLevel} - Changed from ${log.changedVocationName} to ${log.currentVocationName}.`
                             );
 
-                        await channelDeaths.send({
+                        await channelChanges.send({
                             embeds: [embed],
                         });
                     }
